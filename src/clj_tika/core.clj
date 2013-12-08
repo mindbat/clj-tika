@@ -1,17 +1,12 @@
-;; Clojure Interface to Apache Tika library
-(ns tika
+(ns clj-tika.core
   (:import [java.io InputStream File FileInputStream]
            [java.net URL]
            [org.apache.tika.parser Parser AutoDetectParser ParseContext]
            [org.apache.tika.language LanguageIdentifier]
            [org.apache.tika.metadata Metadata]
            [org.apache.tika Tika]
-           [org.apache.tika.sax BodyContentHandler]
-           )
-  (:use [clojure.java.io :only [input-stream]])
-  )
-
-;; TODO: add separate function to extract only meta-data
+           [org.apache.tika.sax BodyContentHandler])
+  (:use [clojure.java.io :only [input-stream]]))
 
 (def ^{:private true} tika-class (Tika.))
 
@@ -23,8 +18,7 @@
 (defprotocol TikaProtocol
   "Protocol for Tika library"
   (parse [this] "Performs parsing of given object")
-  (detect-mime-type [this] "Detects mime-type of given object")
-  )
+  (detect-mime-type [this] "Detects mime-type of given object"))
 
 (extend-protocol TikaProtocol
   InputStream
@@ -32,8 +26,7 @@
          (let [parser (AutoDetectParser.)
                context (ParseContext.)
                metadata (Metadata.)
-               handler (BodyContentHandler. -1)
-               ]
+               handler (BodyContentHandler. -1)]
            (.set context Parser parser)
            (.parse parser ifile handler metadata context)
            (assoc (conv-metadata metadata) :text (.toString handler))))
